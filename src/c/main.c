@@ -143,12 +143,9 @@ static unsigned short get_display_hour(unsigned short hour) {
 
 static int prv_extract_offset(char settingString[], int unit) { //utc-1200
 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "prv extract offset called");;
   if (strcmp(settingString, "localtime") == 0 || strcmp(settingString, "disabled") == 0) {
         return 0;
   }
-
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "continuing");;
   int offset = -1;
   char offsetstr[3] = "00";
   switch (unit) {
@@ -161,10 +158,8 @@ static int prv_extract_offset(char settingString[], int unit) { //utc-1200
   }
   offsetstr[2] = '\0';
 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "offsetstring now %s", offsetstr);
   offset = atoi(offsetstr);
 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "offset now %d", offset);
   switch (settingString[3]) { //positive or negative?
     case '+':
       return offset;
@@ -179,7 +174,6 @@ static int prv_extract_offset(char settingString[], int unit) { //utc-1200
 #define CLOCK_ID_BIG_GMT 0
 #define CLOCK_ID_SMALL_GMT 1
 static void prv_set_gmt(int clockid) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "prb set gmt called");;
   char settingString[10];
   switch (clockid) {
     case CLOCK_ID_BIG_GMT:
@@ -208,8 +202,6 @@ static void prv_set_gmt(int clockid) {
 }
 
 static void prv_display_time(struct tm *tick_time) {
-  time_t now = time(NULL);
-  struct tm *tick_time_gmt = gmtime(&now);
   if (strcmp(settings.bigGMT, "localtime")==0)
   {
     display_value(get_display_hour(tick_time->tm_hour), 0, false);
@@ -222,7 +214,6 @@ static void prv_display_time(struct tm *tick_time) {
   } else {
     prv_set_gmt(CLOCK_ID_SMALL_GMT);
   }
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "tick_time gmtoff %d", tick_time->tm_gmtoff);;
 }
 
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
@@ -280,7 +271,6 @@ static void prv_deinit(void) {
 
 int main(void) {
   prv_init();
-  //APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", s_window);
   app_event_loop();
   prv_deinit();
 }
