@@ -224,7 +224,7 @@ static void prv_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_text_layer = text_layer_create(GRect(0, 72, bounds.size.w, 20));
+  s_text_layer = text_layer_create(GRect(0, 75, bounds.size.w, 20));
   text_layer_set_text_color(s_text_layer, GColorWhite);
   text_layer_set_background_color(s_text_layer, GColorClear);
   text_layer_set_text(s_text_layer, "Hello World!");
