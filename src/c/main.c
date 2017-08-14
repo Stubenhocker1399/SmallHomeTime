@@ -178,7 +178,7 @@ static int prv_extract_offset(char settingString[], int unit) { //utc-1200
 
 #define CLOCK_ID_BIG_GMT 0
 #define CLOCK_ID_SMALL_GMT 1
-static void prv_set_gmt(int clockid, struct tm *tick_time) {
+static void prv_set_gmt(int clockid) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "prb set gmt called");;
   char settingString[10];
   switch (clockid) {
@@ -192,22 +192,16 @@ static void prv_set_gmt(int clockid, struct tm *tick_time) {
 
   int hourOffset = prv_extract_offset(settingString, HOUR_UNIT);
   int minuteOffset = prv_extract_offset(settingString, MINUTE_UNIT);
-  
+  time_t now = time(NULL) + (hourOffset * 60 * 60) + (minuteOffset * 60);
+  struct tm *tick_time = gmtime(&now);
   switch(clockid) {
     case CLOCK_ID_BIG_GMT:
-      display_value(get_display_hour(tick_time->tm_hour) + hourOffset, 0, false);
-      display_value(tick_time->tm_min + minuteOffset, 1, true);
+      display_value(get_display_hour(tick_time->tm_hour), 0, false);
+      display_value(tick_time->tm_min, 1, true);
     break;
     case CLOCK_ID_SMALL_GMT:;
-      static char hourbuf[] = "00";
-      snprintf(hourbuf, sizeof(hourbuf), "%d", get_display_hour(tick_time->tm_hour) + hourOffset);
-      static char minutebuf[] = "00";
-      snprintf(minutebuf, sizeof(minutebuf), "%d", tick_time->tm_min + minuteOffset);
       static char displaybuf[] = "00:00";
-      strcpy(displaybuf, hourbuf);
-      strcat(displaybuf, ":");
-      strcat(displaybuf, minutebuf);
-      displaybuf[5] = '\0';
+      strftime(displaybuf, sizeof(displaybuf), "%H:%M", tick_time);
       text_layer_set_text(s_text_layer, displaybuf);
     break;
   }
@@ -218,14 +212,15 @@ static void prv_display_time(struct tm *tick_time) {
   struct tm *tick_time_gmt = gmtime(&now);
   if (strcmp(settings.bigGMT, "localtime")==0)
   {
-    prv_set_gmt(CLOCK_ID_BIG_GMT, tick_time);
+    display_value(get_display_hour(tick_time->tm_hour), 0, false);
+    display_value(tick_time->tm_min, 1, true);
   } else {
-    prv_set_gmt(CLOCK_ID_BIG_GMT, tick_time_gmt);
+    prv_set_gmt(CLOCK_ID_BIG_GMT);
   }
   if (strcmp(settings.smallGMT, "disabled")==0){
     text_layer_set_text(s_text_layer, "");
   } else {
-    prv_set_gmt(CLOCK_ID_SMALL_GMT, tick_time_gmt);
+    prv_set_gmt(CLOCK_ID_SMALL_GMT);
   }
   APP_LOG(APP_LOG_LEVEL_DEBUG, "tick_time gmtoff %d", tick_time->tm_gmtoff);;
 }
