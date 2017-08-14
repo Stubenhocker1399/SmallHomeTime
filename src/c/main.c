@@ -234,6 +234,7 @@ static void prv_window_load(Window *window) {
   time_t now = time(NULL);
   struct tm *tick_time = localtime(&now);
   prv_display_time(tick_time);
+  prv_display_time(tick_time);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 }
